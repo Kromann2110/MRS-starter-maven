@@ -48,7 +48,7 @@ public class MovieDAO_File implements IMovieDataAccess {
         }
         return movies;
     }
-
+    // Create button
     @Override
     public Movie createMovie(Movie newMovie) throws Exception {
         ensureFileExists();
@@ -68,6 +68,7 @@ public class MovieDAO_File implements IMovieDataAccess {
         return new Movie(nextId, newMovie.getYear(), newMovie.getTitle());
     }
 
+    // Update button
     @Override
     public void updateMovie(Movie updatedMovie) throws Exception {
         ensureFileExists();
@@ -100,6 +101,7 @@ public class MovieDAO_File implements IMovieDataAccess {
         Files.write(Paths.get(MOVIES_FILE), updatedLines); // Write all lines back
     }
 
+    // Delete button
     @Override
     public void deleteMovie(Movie movie) throws Exception {
         ensureFileExists();
@@ -128,7 +130,7 @@ public class MovieDAO_File implements IMovieDataAccess {
         Files.write(Paths.get(MOVIES_FILE), updatedLines); // Write without deleted movie
     }
 
-    // In MovieDAO_File class - add this method
+    // Implementation of the update button
     public void renumberMovies() throws Exception {
         ensureFileExists();
         List<String> lines = Files.readAllLines(Paths.get(MOVIES_FILE));

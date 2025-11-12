@@ -67,7 +67,7 @@ public class MovieModel {
         loadAllMoviesFromFile(); // Refresh list
     }
 
-    // In MovieModel class - add this method
+    // When you press the update button it changes the line-up to it matches the sequence of the id-numbers
     public void renumberMovies() throws Exception {
         movieDAO.renumberMovies();
         loadAllMoviesFromFile(); // Refresh the list
