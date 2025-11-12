@@ -1,4 +1,5 @@
 package dk.easv.mrs.DAL;
+
 import dk.easv.mrs.BE.Movie;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,6 +49,7 @@ public class MovieDAO_File implements IMovieDataAccess {
         }
         return movies;
     }
+
     // Create button
     @Override
     public Movie createMovie(Movie newMovie) throws Exception {
@@ -163,5 +165,4 @@ public class MovieDAO_File implements IMovieDataAccess {
         // Write all lines back with new IDs
         Files.write(Paths.get(MOVIES_FILE), updatedLines);
     }
-
 }

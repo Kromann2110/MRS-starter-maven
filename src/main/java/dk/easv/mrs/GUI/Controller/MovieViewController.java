@@ -1,4 +1,5 @@
 package dk.easv.mrs.GUI.Controller;
+
 import dk.easv.mrs.BE.Movie;
 import dk.easv.mrs.GUI.Model.MovieModel;
 import javafx.event.ActionEvent;
