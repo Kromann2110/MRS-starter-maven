@@ -55,27 +55,9 @@ public class MovieViewController implements Initializable {
         alert.showAndWait();
     }
 
-    // DELETE button - deletes the selected movie
+    // CREATE button - creates new movie
     @FXML
-    private void handleDelete(ActionEvent event) {
-        Movie selected = lstMovies.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            try {
-                movieModel.deleteMovie(selected);
-                clearFields();
-                // Renumber after deletion to fix sequence
-                movieModel.renumberMovies();
-            } catch (Exception e) {
-                displayError(e);
-            }
-        } else {
-            showAlert("No Movie Selected", "Please select a movie to delete");
-        }
-    }
-
-    // UPDATE button - updates selected movie OR creates new movie
-    @FXML
-    private void handleUpdate(ActionEvent event) {
+    private void handleCreate(ActionEvent event) {
         String title = txtTitle.getText().trim();
         String yearText = txtYear.getText().trim();
 
@@ -86,42 +68,91 @@ public class MovieViewController implements Initializable {
 
         try {
             int year = Integer.parseInt(yearText);
-            Movie selectedMovie = lstMovies.getSelectionModel().getSelectedItem();
+            Movie newMovie = new Movie(-1, year, title);
+            movieModel.createMovie(newMovie);
 
-            if (selectedMovie != null) {
-                // UPDATE existing movie
-                Movie movieToBeUpdated = new Movie(
-                        selectedMovie.getId(),
-                        year,
-                        title
-                );
-                movieModel.updateMovie(movieToBeUpdated);
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Success");
-                alert.setHeaderText("Movie Updated");
-                alert.setContentText("The movie has been updated successfully.");
-                alert.showAndWait();
-            } else {
-                // CREATE new movie
-                Movie newMovie = new Movie(-1, year, title);
-                movieModel.createMovie(newMovie);
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Success");
-                alert.setHeaderText("Movie Created");
-                alert.setContentText("New movie has been added to the list.");
-                alert.showAndWait();
-            }
-
-            // Always renumber to maintain sequence
+            // Renumber after creating to maintain sequence
             movieModel.renumberMovies();
+
             clearFields();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success");
+            alert.setHeaderText("Movie Created");
+            alert.setContentText("New movie has been added to the list.");
+            alert.showAndWait();
 
         } catch (NumberFormatException e) {
             showAlert("Invalid Year", "Please enter a valid year number");
         } catch (Exception e) {
             displayError(e);
+        }
+    }
+
+    // UPDATE button - updates selected movie's title and year
+    @FXML
+    private void handleUpdate(ActionEvent event) {
+        Movie selectedMovie = lstMovies.getSelectionModel().getSelectedItem();
+        if (selectedMovie == null) {
+            showAlert("No Movie Selected", "Please select a movie to update");
+            return;
+        }
+
+        String newTitle = txtTitle.getText().trim();
+        String yearText = txtYear.getText().trim();
+
+        if (newTitle.isEmpty() || yearText.isEmpty()) {
+            showAlert("Missing Information", "Please enter both title and year");
+            return;
+        }
+
+        try {
+            int newYear = Integer.parseInt(yearText);
+
+            // Update the selected movie
+            Movie movieToBeUpdated = new Movie(
+                    selectedMovie.getId(),
+                    newYear,
+                    newTitle
+            );
+            movieModel.updateMovie(movieToBeUpdated);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success");
+            alert.setHeaderText("Movie Updated");
+            alert.setContentText("The movie has been updated successfully.");
+            alert.showAndWait();
+
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Year", "Please enter a valid year number");
+        } catch (Exception e) {
+            displayError(e);
+        }
+    }
+
+    // DELETE button - deletes selected movie and renumbers
+    @FXML
+    private void handleDelete(ActionEvent event) {
+        Movie selected = lstMovies.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            try {
+                movieModel.deleteMovie(selected);
+                clearFields();
+
+                // Renumber after deletion to fix sequence
+                movieModel.renumberMovies();
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText("Movie Deleted");
+                alert.setContentText("The movie has been deleted and list renumbered.");
+                alert.showAndWait();
+
+            } catch (Exception e) {
+                displayError(e);
+            }
+        } else {
+            showAlert("No Movie Selected", "Please select a movie to delete");
         }
     }
 

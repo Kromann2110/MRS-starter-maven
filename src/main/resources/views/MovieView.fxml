@@ -11,7 +11,8 @@
         <TextField fx:id="txtMovieSearch" layoutX="10.0" layoutY="146.0" prefHeight="25.0" prefWidth="320.0" promptText="Search" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="146.0" />
         <TextField fx:id="txtTitle" layoutX="10.0" layoutY="25.0" prefHeight="25.0" prefWidth="152.0" promptText="Movie title" />
         <TextField fx:id="txtYear" layoutX="10.0" layoutY="65.0" prefHeight="25.0" prefWidth="152.0" promptText="Movie year" />
-        <Button fx:id="btnUpdate" layoutX="204.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleUpdate" prefHeight="25.0" prefWidth="122.0" text="Update" />
-        <Button fx:id="btnDelete" layoutX="204.0" layoutY="65.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="25.0" prefWidth="122.0" text="Delete" />
+        <Button fx:id="btnCreate" layoutX="204.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCreate" prefHeight="25.0" prefWidth="122.0" text="Create" />
+        <Button fx:id="btnUpdate" layoutX="204.0" layoutY="65.0" mnemonicParsing="false" onAction="#handleUpdate" prefHeight="25.0" prefWidth="122.0" text="Update" />
+        <Button fx:id="btnDelete" layoutX="204.0" layoutY="105.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="25.0" prefWidth="122.0" text="Delete" />
     </children>
 </AnchorPane>
