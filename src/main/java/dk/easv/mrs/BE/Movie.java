@@ -1,7 +1,7 @@
 package dk.easv.mrs.BE;
 
+// Represents a movie
 public class Movie {
-
     private int id;
     private String title;
     private int year;
@@ -12,29 +12,16 @@ public class Movie {
         this.year = year;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
+    // Getters and setters
+    public int getId() { return id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
+        // Format: "1: Inception (2010)" - shown in ListView
         return id + ": " + title + " ("+year+")";
     }
 }
