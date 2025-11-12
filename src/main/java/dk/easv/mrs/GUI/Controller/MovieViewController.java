@@ -2,7 +2,6 @@ package dk.easv.mrs.GUI.Controller;
 
 import dk.easv.mrs.BE.Movie;
 import dk.easv.mrs.GUI.Model.MovieModel;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -50,8 +49,9 @@ public class MovieViewController implements Initializable {
         alert.showAndWait();
     }
 
+    //Create button implementation
     @FXML
-    private void btnHandleClick(ActionEvent actionEvent) throws Exception {
+    private void btnHandleClick() throws Exception {
         // Get input from text fields
         String title = txtTitle.getText();
         int year = Integer.parseInt(txtYear.getText());
@@ -61,8 +61,9 @@ public class MovieViewController implements Initializable {
         movieModel.createMovie(newMovie);
     }
 
+    // delete button implementation
     @FXML
-    private void btnHandleDelete(ActionEvent actionEvent) {
+    private void btnHandleDelete() {
         Movie selected = lstMovies.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
@@ -76,8 +77,9 @@ public class MovieViewController implements Initializable {
         }
     }
 
+    // Update button implementation
     @FXML
-    private void btnHandleUpdate(ActionEvent actionEvent) {
+    private void btnHandleUpdate() {
         try {
             // This will now renumber all movies sequentially
             movieModel.renumberMovies();

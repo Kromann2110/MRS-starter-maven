@@ -14,29 +14,33 @@ public class MovieManager {
         movieDAO = new MovieDAO_File(); // Uses file storage
     }
 
+    //list of the movies
     public List<Movie> getAllMovies() throws Exception {
-        return movieDAO.getAllMovies(); // Delegate to data layer
+        return movieDAO.getAllMovies();
     }
-
+    // Search button
     public List<Movie> searchMovies(String query) throws Exception {
         // Get all movies first, then filter
         List<Movie> allMovies = getAllMovies();
         return movieSearcher.search(allMovies, query);
     }
 
+    //Create button
     public Movie createMovie(Movie newMovie) throws Exception {
         return movieDAO.createMovie(newMovie); // Data layer handles ID generation
     }
 
+    // delete button
     public void deleteMovie(Movie movie) throws Exception {
-        movieDAO.deleteMovie(movie); // Delegate to data layer
+        movieDAO.deleteMovie(movie);
     }
 
+    // Update button
     public void updateMovie(Movie movie) throws Exception {
-        movieDAO.updateMovie(movie); // Delegate to data layer
+        movieDAO.updateMovie(movie);
     }
 
-    // In MovieManager class - add this method
+    // when you press update it will sequence the id's
     public void renumberMovies() throws Exception {
         movieDAO.renumberMovies();
     }
