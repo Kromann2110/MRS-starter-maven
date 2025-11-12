@@ -2,6 +2,7 @@ package dk.easv.mrs.GUI.Controller;
 
 import dk.easv.mrs.BE.Movie;
 import dk.easv.mrs.GUI.Model.MovieModel;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -10,18 +11,18 @@ import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-// Controls the main movie screen
 public class MovieViewController implements Initializable {
     public TextField txtMovieSearch;
     public ListView<Movie> lstMovies;
-    private MovieModel movieModel;
 
     @FXML
     private TextField txtTitle, txtYear;
 
+    private MovieModel movieModel;
+
     public MovieViewController() {
         try {
-            movieModel = new MovieModel(); // Initialize data model
+            movieModel = new MovieModel();
         } catch (Exception e) {
             displayError(e);
         }
@@ -29,13 +30,18 @@ public class MovieViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Connect ListView to movie data
         lstMovies.setItems(movieModel.getObservableMovies());
 
-        // Real-time search as user types
+        lstMovies.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedMovie) -> {
+            if (selectedMovie != null) {
+                txtTitle.setText(selectedMovie.getTitle());
+                txtYear.setText(String.valueOf(selectedMovie.getYear()));
+            }
+        });
+
         txtMovieSearch.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
-                movieModel.searchMovie(newValue); // Filter movies
+                movieModel.searchMovie(newValue);
             } catch (Exception e) {
                 displayError(e);
             }
@@ -49,57 +55,80 @@ public class MovieViewController implements Initializable {
         alert.showAndWait();
     }
 
-    //Create button implementation
+    // DELETE button - deletes the selected movie
     @FXML
-    private void btnHandleClick() throws Exception {
-        // Get input from text fields
-        String title = txtTitle.getText();
-        int year = Integer.parseInt(txtYear.getText());
-
-        // Create and save new movie
-        Movie newMovie = new Movie(-1, year, title);
-        movieModel.createMovie(newMovie);
-    }
-
-    // delete button implementation
-    @FXML
-    private void btnHandleDelete() {
+    private void handleDelete(ActionEvent event) {
         Movie selected = lstMovies.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
-                movieModel.deleteMovie(selected); // Delete selected movie
+                movieModel.deleteMovie(selected);
                 clearFields();
+                // Renumber after deletion to fix sequence
+                movieModel.renumberMovies();
             } catch (Exception e) {
                 displayError(e);
             }
         } else {
-            showAlert("No movie selected", "Please select a movie to delete");
+            showAlert("No Movie Selected", "Please select a movie to delete");
         }
     }
 
-    // Update button implementation
+    // UPDATE button - updates selected movie OR creates new movie
     @FXML
-    private void btnHandleUpdate() {
+    private void handleUpdate(ActionEvent event) {
+        String title = txtTitle.getText().trim();
+        String yearText = txtYear.getText().trim();
+
+        if (title.isEmpty() || yearText.isEmpty()) {
+            showAlert("Missing Information", "Please enter both title and year");
+            return;
+        }
+
         try {
-            // This will now renumber all movies sequentially
+            int year = Integer.parseInt(yearText);
+            Movie selectedMovie = lstMovies.getSelectionModel().getSelectedItem();
+
+            if (selectedMovie != null) {
+                // UPDATE existing movie
+                Movie movieToBeUpdated = new Movie(
+                        selectedMovie.getId(),
+                        year,
+                        title
+                );
+                movieModel.updateMovie(movieToBeUpdated);
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText("Movie Updated");
+                alert.setContentText("The movie has been updated successfully.");
+                alert.showAndWait();
+            } else {
+                // CREATE new movie
+                Movie newMovie = new Movie(-1, year, title);
+                movieModel.createMovie(newMovie);
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText("Movie Created");
+                alert.setContentText("New movie has been added to the list.");
+                alert.showAndWait();
+            }
+
+            // Always renumber to maintain sequence
             movieModel.renumberMovies();
+            clearFields();
 
-            // Show success message
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText("Movies renumbered successfully");
-            alert.setContentText("All movies now have sequential IDs.");
-            alert.showAndWait();
-
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Year", "Please enter a valid year number");
         } catch (Exception e) {
             displayError(e);
         }
     }
 
     private void clearFields() {
-        lstMovies.getSelectionModel().clearSelection();
         txtTitle.clear();
         txtYear.clear();
+        lstMovies.getSelectionModel().clearSelection();
     }
 
     private void showAlert(String header, String content) {

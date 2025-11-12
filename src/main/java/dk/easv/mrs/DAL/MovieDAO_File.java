@@ -1,11 +1,15 @@
 package dk.easv.mrs.DAL;
 
 import dk.easv.mrs.BE.Movie;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 // Stores movies in text file (format: id,year,title)
@@ -70,37 +74,56 @@ public class MovieDAO_File implements IMovieDataAccess {
         return new Movie(nextId, newMovie.getYear(), newMovie.getTitle());
     }
 
-    // Update button
+
+// Update button - This should update an existing movie, not renumber all
     @Override
-    public void updateMovie(Movie updatedMovie) throws Exception {
-        ensureFileExists();
-        List<String> lines = Files.readAllLines(Paths.get(MOVIES_FILE));
-        List<String> updatedLines = new ArrayList<>();
-        boolean movieFound = false;
+    public void updateMovie(Movie movie) throws Exception {
+        try
+        {
+            // Read all movie lines in list
+            List<String> movies = Files.readAllLines(Paths.get(MOVIES_FILE));
 
-        for (String line : lines) {
-            if (line.trim().isEmpty()) {
-                updatedLines.add(line);
-                continue;
-            }
+            // Iterate through all lines and look for the right one (movie)
+            for (int i = 0; i < movies.size(); i++)
+            {
+                // Split each line into atomic parts
+                String[] separatedLine = movies.get(i).split(",");
 
-            String[] parts = line.split(",");
-            if (parts.length >= 3) {
-                int currentId = Integer.parseInt(parts[0].trim());
+                // Make sure we have a valid movie with all parts
+                if(separatedLine.length >= 3) {
+                    // individual movie items
+                    int id = Integer.parseInt(separatedLine[0]);
 
-                // Replace line if ID matches
-                if (currentId == updatedMovie.getId()) {
-                    updatedLines.add(updatedMovie.getId() + "," + updatedMovie.getYear() + "," + updatedMovie.getTitle());
-                    movieFound = true;
-                } else {
-                    updatedLines.add(line); // Keep original line
+                    // Check if the id is equal to movie.getId()
+                    if (id == movie.getId()) {
+                        String updatedMovieLine = movie.getId() + "," + movie.getYear() + "," + movie.getTitle();
+                        movies.set(i, updatedMovieLine);
+                        break;
+                    }
                 }
             }
+
+            // Create new temp file
+            Path filePath = Paths.get(MOVIES_FILE);  // Declare filePath here
+            Path tempPathFile = Paths.get(MOVIES_FILE + "_TEMP");
+
+            // Delete temp file if it exists from previous operations
+            Files.deleteIfExists(tempPathFile);
+            Files.createFile(tempPathFile);
+
+            // For all lines...
+            for (String line: movies) {
+                Files.write(tempPathFile, (line + System.lineSeparator()).getBytes(), APPEND);
+            }
+
+            // Overwrite the old file with temp file
+            Files.copy(tempPathFile, filePath, REPLACE_EXISTING);
+            Files.deleteIfExists(tempPathFile);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new Exception("An error occurred while updating the movie");
         }
-
-        if (!movieFound) throw new Exception("Movie not found for update");
-
-        Files.write(Paths.get(MOVIES_FILE), updatedLines); // Write all lines back
     }
 
     // Delete button
@@ -132,7 +155,7 @@ public class MovieDAO_File implements IMovieDataAccess {
         Files.write(Paths.get(MOVIES_FILE), updatedLines); // Write without deleted movie
     }
 
-    // Implementation of the update button
+    // Renumber movies - This should be a separate functionality, not the main update
     public void renumberMovies() throws Exception {
         ensureFileExists();
         List<String> lines = Files.readAllLines(Paths.get(MOVIES_FILE));
