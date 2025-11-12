@@ -21,7 +21,7 @@ public class Movie {
 
     @Override
     public String toString() {
-        // Format: "1: Inception (2010)" - shown in ListView
+        // first id, then title, and then year
         return id + ": " + title + " ("+year+")";
     }
 }
