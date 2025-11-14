@@ -22,6 +22,6 @@ public class Movie {
     @Override
     public String toString() {
         // first id, then title, and then year
-        return id + ": " + title + " ("+year+")";
+        return title + " ("+year+")";
     }
 }

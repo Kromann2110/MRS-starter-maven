@@ -71,9 +71,6 @@ public class MovieViewController implements Initializable {
             Movie newMovie = new Movie(-1, year, title);
             movieModel.createMovie(newMovie);
 
-            // Renumber after creating to maintain sequence
-            movieModel.renumberMovies();
-
             clearFields();
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -130,7 +127,7 @@ public class MovieViewController implements Initializable {
         }
     }
 
-    // DELETE button - deletes selected movie and renumbers
+    // DELETE button - deletes selected movie
     @FXML
     private void handleDelete(ActionEvent event) {
         Movie selected = lstMovies.getSelectionModel().getSelectedItem();
@@ -139,13 +136,10 @@ public class MovieViewController implements Initializable {
                 movieModel.deleteMovie(selected);
                 clearFields();
 
-                // Renumber after deletion to fix sequence
-                movieModel.renumberMovies();
-
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
                 alert.setHeaderText("Movie Deleted");
-                alert.setContentText("The movie has been deleted and list renumbered.");
+                alert.setContentText("The movie has been deleted.");
                 alert.showAndWait();
 
             } catch (Exception e) {

@@ -23,13 +23,15 @@ public class MovieModel {
         return filteredMovies;
     }
 
-    private void loadAllMoviesFromFile() {
+    private void loadAllMoviesFromFile() throws Exception {
         try {
             List<Movie> allMoviesFromFile = movieManager.getAllMovies();
             moviesToShowOnScreen.clear();
             moviesToShowOnScreen.addAll(allMoviesFromFile);
+            System.out.println("DEBUG: Loaded " + allMoviesFromFile.size() + " movies into model");
         } catch (Exception e) {
-            throw new RuntimeException("Could not load movies", e);
+            System.err.println("ERROR: Could not load movies: " + e.getMessage());
+            throw new Exception("Could not load movies from file", e);
         }
     }
 
@@ -39,28 +41,27 @@ public class MovieModel {
         } else {
             String query = searchText.toLowerCase();
             filteredMovies.setPredicate(movie ->
-                    movie.getTitle().toLowerCase().contains(query)
+                    movie.getTitle().toLowerCase().contains(query) ||
+                            String.valueOf(movie.getYear()).contains(query)
             );
         }
     }
 
     public void createMovie(Movie movie) throws Exception {
-        movieManager.createMovie(movie);
-        loadAllMoviesFromFile();
+        Movie createdMovie = movieManager.createMovie(movie);
+        System.out.println("DEBUG: Created movie in model: " + createdMovie);
+        loadAllMoviesFromFile(); // Reload to reflect changes
     }
 
     public void deleteMovie(Movie movie) throws Exception {
         movieManager.deleteMovie(movie);
-        loadAllMoviesFromFile();
+        System.out.println("DEBUG: Deleted movie in model: " + movie);
+        loadAllMoviesFromFile(); // Reload to reflect changes
     }
 
     public void updateMovie(Movie movieToBeUpdated) throws Exception {
         movieManager.updateMovie(movieToBeUpdated);
+        System.out.println("DEBUG: Updated movie in model: " + movieToBeUpdated);
         loadAllMoviesFromFile(); // Refresh the list
-    }
-
-    public void renumberMovies() throws Exception {
-        movieManager.renumberMovies();
-        loadAllMoviesFromFile(); // Refresh the list after renumbering
     }
 }

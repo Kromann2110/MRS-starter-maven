@@ -39,9 +39,4 @@ public class MovieManager {
     public void updateMovie(Movie movie) throws Exception {
         movieDAO.updateMovie(movie);
     }
-
-    // when you press update it will sequence the id's
-    public void renumberMovies() throws Exception {
-        movieDAO.renumberMovies();
-    }
 }
