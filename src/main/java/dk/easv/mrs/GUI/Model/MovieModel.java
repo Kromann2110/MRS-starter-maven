@@ -24,15 +24,9 @@ public class MovieModel {
     }
 
     private void loadAllMoviesFromFile() throws Exception {
-        try {
-            List<Movie> allMoviesFromFile = movieManager.getAllMovies();
-            moviesToShowOnScreen.clear();
-            moviesToShowOnScreen.addAll(allMoviesFromFile);
-            System.out.println("DEBUG: Loaded " + allMoviesFromFile.size() + " movies into model");
-        } catch (Exception e) {
-            System.err.println("ERROR: Could not load movies: " + e.getMessage());
-            throw new Exception("Could not load movies from file", e);
-        }
+        List<Movie> allMoviesFromFile = movieManager.getAllMovies();
+        moviesToShowOnScreen.clear();
+        moviesToShowOnScreen.addAll(allMoviesFromFile);
     }
 
     public void searchMovie(String searchText) throws Exception {
@@ -48,20 +42,17 @@ public class MovieModel {
     }
 
     public void createMovie(Movie movie) throws Exception {
-        Movie createdMovie = movieManager.createMovie(movie);
-        System.out.println("DEBUG: Created movie in model: " + createdMovie);
-        loadAllMoviesFromFile(); // Reload to reflect changes
+        movieManager.createMovie(movie);
+        loadAllMoviesFromFile();
     }
 
     public void deleteMovie(Movie movie) throws Exception {
         movieManager.deleteMovie(movie);
-        System.out.println("DEBUG: Deleted movie in model: " + movie);
-        loadAllMoviesFromFile(); // Reload to reflect changes
+        loadAllMoviesFromFile();
     }
 
     public void updateMovie(Movie movieToBeUpdated) throws Exception {
         movieManager.updateMovie(movieToBeUpdated);
-        System.out.println("DEBUG: Updated movie in model: " + movieToBeUpdated);
-        loadAllMoviesFromFile(); // Refresh the list
+        loadAllMoviesFromFile();
     }
 }

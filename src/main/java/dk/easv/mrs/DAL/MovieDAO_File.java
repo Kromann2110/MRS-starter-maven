@@ -11,9 +11,8 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 public class MovieDAO_File implements IMovieDataAccess {
-    private static final String MOVIES_FILE = "data/My Movies.txt"; // Relative path
+    private static final String MOVIES_FILE = "data/My Movies.txt";
 
-    // Add this constructor to debug file location
     public MovieDAO_File() {
         try {
             ensureFileExists();
@@ -23,12 +22,11 @@ public class MovieDAO_File implements IMovieDataAccess {
         }
     }
 
-    // Makes sure file exists before operations
     private void ensureFileExists() throws Exception {
         Path path = Paths.get(MOVIES_FILE);
         if (!Files.exists(path)) {
-            Files.createDirectories(path.getParent()); // Create folders if needed
-            Files.createFile(path); // Create file
+            Files.createDirectories(path.getParent());
+            Files.createFile(path);
             System.out.println("Created new movies file at: " + path.toAbsolutePath());
         }
     }
@@ -39,59 +37,42 @@ public class MovieDAO_File implements IMovieDataAccess {
         List<String> lines = Files.readAllLines(Paths.get(MOVIES_FILE));
         List<Movie> movies = new ArrayList<>();
 
-        System.out.println("DEBUG: Reading " + lines.size() + " lines from file");
-
         for (String line: lines) {
             if (line.trim().isEmpty()) continue;
 
-            String[] parts = line.split(",", 3); // Split into max 3 parts
-            if (parts.length < 3) {
-                System.out.println("DEBUG: Skipping invalid line: " + line);
-                continue;
-            }
+            String[] parts = line.split(",", 3);
+            // REMOVED: No more checking for insufficient parts - will crash if less than 3
 
-            try {
-                int id = Integer.parseInt(parts[0].trim());
-                int year = Integer.parseInt(parts[1].trim());
-                String title = parts[2].trim();
+            // REMOVED: No more try-catch - will crash on NumberFormatException
+            int id = Integer.parseInt(parts[0].trim());
+            int year = Integer.parseInt(parts[1].trim());
+            String title = parts[2].trim();
 
-                movies.add(new Movie(id, year, title));
-                System.out.println("DEBUG: Loaded movie - ID: " + id + ", Year: " + year + ", Title: " + title);
-            } catch (NumberFormatException e) {
-                System.err.println("DEBUG: Error parsing line: " + line + " - " + e.getMessage());
-            }
+            movies.add(new Movie(id, year, title));
         }
 
-        System.out.println("DEBUG: Successfully loaded " + movies.size() + " movies");
         return movies;
     }
 
-    // Create button - FIXED
     @Override
     public Movie createMovie(Movie newMovie) throws Exception {
         ensureFileExists();
-        List<Movie> allMovies = getAllMovies(); // Use our own method to get current movies
+        List<Movie> allMovies = getAllMovies();
 
-        // Generate next ID (last movie's ID + 1)
         int nextId = 1;
         if (!allMovies.isEmpty()) {
             Movie lastMovie = allMovies.get(allMovies.size() - 1);
             nextId = lastMovie.getId() + 1;
         }
 
-        // Append new movie to file
         String newMovieLine = nextId + "," + newMovie.getYear() + "," + newMovie.getTitle();
         Files.write(Paths.get(MOVIES_FILE), (System.lineSeparator() + newMovieLine).getBytes(), APPEND);
-
-        System.out.println("DEBUG: Created new movie: " + nextId + "," + newMovie.getYear() + "," + newMovie.getTitle());
 
         return new Movie(nextId, newMovie.getYear(), newMovie.getTitle());
     }
 
-    // Update button - FIXED
     @Override
     public void updateMovie(Movie movie) throws Exception {
-        System.out.println("DEBUG: Updating movie: " + movie.getId() + ", " + movie.getTitle() + ", " + movie.getYear());
         ensureFileExists();
 
         List<String> lines = Files.readAllLines(Paths.get(MOVIES_FILE));
@@ -105,24 +86,16 @@ public class MovieDAO_File implements IMovieDataAccess {
             }
 
             String[] parts = line.split(",", 3);
-            if (parts.length >= 3) {
-                try {
-                    int currentId = Integer.parseInt(parts[0].trim());
+            // REMOVED: No more length checking
 
-                    if (currentId == movie.getId()) {
-                        // Replace with updated movie
-                        String updatedLine = movie.getId() + "," + movie.getYear() + "," + movie.getTitle();
-                        updatedLines.add(updatedLine);
-                        movieFound = true;
-                        System.out.println("DEBUG: Updated line: " + updatedLine);
-                    } else {
-                        updatedLines.add(line);
-                    }
-                } catch (NumberFormatException e) {
-                    updatedLines.add(line); // Keep invalid lines as-is
-                }
+            int currentId = Integer.parseInt(parts[0].trim());
+
+            if (currentId == movie.getId()) {
+                String updatedLine = movie.getId() + "," + movie.getYear() + "," + movie.getTitle();
+                updatedLines.add(updatedLine);
+                movieFound = true;
             } else {
-                updatedLines.add(line); // Keep invalid lines as-is
+                updatedLines.add(line);
             }
         }
 
@@ -130,15 +103,11 @@ public class MovieDAO_File implements IMovieDataAccess {
             throw new Exception("Movie with ID " + movie.getId() + " not found for update");
         }
 
-        // Write all lines back
         Files.write(Paths.get(MOVIES_FILE), updatedLines);
-        System.out.println("DEBUG: Movie update completed successfully");
     }
 
-    // Delete button - FIXED
     @Override
     public void deleteMovie(Movie movie) throws Exception {
-        System.out.println("DEBUG: Deleting movie: " + movie.getId());
         ensureFileExists();
 
         List<String> lines = Files.readAllLines(Paths.get(MOVIES_FILE));
@@ -152,21 +121,14 @@ public class MovieDAO_File implements IMovieDataAccess {
             }
 
             String[] parts = line.split(",", 3);
-            if (parts.length >= 3) {
-                try {
-                    int currentId = Integer.parseInt(parts[0].trim());
+            // REMOVED: No more length checking
 
-                    if (currentId != movie.getId()) {
-                        updatedLines.add(line);
-                    } else {
-                        movieFound = true;
-                        System.out.println("DEBUG: Found and removed movie: " + line);
-                    }
-                } catch (NumberFormatException e) {
-                    updatedLines.add(line); // Keep invalid lines
-                }
+            int currentId = Integer.parseInt(parts[0].trim());
+
+            if (currentId != movie.getId()) {
+                updatedLines.add(line);
             } else {
-                updatedLines.add(line); // Keep invalid lines
+                movieFound = true;
             }
         }
 
@@ -175,6 +137,5 @@ public class MovieDAO_File implements IMovieDataAccess {
         }
 
         Files.write(Paths.get(MOVIES_FILE), updatedLines);
-        System.out.println("DEBUG: Movie deletion completed. " + (lines.size() - updatedLines.size()) + " movie(s) removed");
     }
 }
